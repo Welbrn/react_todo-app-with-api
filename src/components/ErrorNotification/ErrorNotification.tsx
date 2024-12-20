@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import cn from 'classnames';
+import { ErrorMessage } from '../../types/ErrorMessage';
 
 type Props = {
-  errorMessage: string;
-  setErrorMessage: (message: string) => void;
+  errorMessage: ErrorMessage | null;
+  setErrorMessage: Dispatch<SetStateAction<ErrorMessage | null>>;
 };
 
 export const ErrorNotification: React.FC<Props> = ({
@@ -13,7 +14,7 @@ export const ErrorNotification: React.FC<Props> = ({
   useEffect(() => {
     if (errorMessage) {
       const timer = setTimeout(() => {
-        setErrorMessage('');
+        setErrorMessage(null);
       }, 3000);
 
       return () => clearTimeout(timer);
@@ -33,7 +34,7 @@ export const ErrorNotification: React.FC<Props> = ({
         data-cy="HideErrorButton"
         type="button"
         className="delete"
-        onClick={() => setErrorMessage('')}
+        onClick={() => setErrorMessage(null)}
       />
       {errorMessage}
     </div>

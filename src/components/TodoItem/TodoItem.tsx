@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Todo } from '../../types/Todo';
 import cn from 'classnames';
 
@@ -21,6 +21,7 @@ export const TodoItem: React.FC<Props> = ({
   const [newTitle, setNewTitle] = useState(todo.title);
 
   const isLoading = editTodos.includes(todo.id);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDelete = () => {
     onDelete(todo.id);
@@ -58,7 +59,11 @@ export const TodoItem: React.FC<Props> = ({
     try {
       await onUpdate(todo.id, newTitle.trim());
       setIsEditing(false);
-    } catch (error) {}
+    } catch {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }
   };
 
   const handleKeyUp = async (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -69,6 +74,12 @@ export const TodoItem: React.FC<Props> = ({
       setIsEditing(false);
     }
   };
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditing]);
 
   return (
     <div data-cy="Todo" className={cn('todo', { completed: todo.completed })}>
@@ -100,7 +111,7 @@ export const TodoItem: React.FC<Props> = ({
           onChange={handleInputChange}
           onBlur={handleBlur}
           onKeyUp={handleKeyUp}
-          autoFocus
+          ref={inputRef}
         />
       )}
       {!isEditing && (

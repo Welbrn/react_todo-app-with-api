@@ -1,11 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Todo } from '../../types/Todo';
 import cn from 'classnames';
 import { USER_ID } from '../../api/todos';
+import { ErrorMessage } from '../../types/ErrorMessage';
 
 type Props = {
   todos: Todo[];
-  setErrorMessage: (message: string) => void;
+  setErrorMessage: Dispatch<SetStateAction<ErrorMessage | null>>;
   handleCreateTodo: (newTodo: Omit<Todo, 'id'>) => Promise<void>;
   isLoading: boolean;
   onToggleAll: () => void;
@@ -21,6 +28,7 @@ export const Header: React.FC<Props> = ({
   const [title, setTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const activeButton = todos.length > 0 && todos.every(todo => todo.completed);
   const focusInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -35,7 +43,7 @@ export const Header: React.FC<Props> = ({
     const trimmedTitle = title.trim();
 
     if (!trimmedTitle) {
-      setErrorMessage('Title should not be empty');
+      setErrorMessage(ErrorMessage.TitleNotEmpty);
 
       return;
     }
@@ -70,7 +78,7 @@ export const Header: React.FC<Props> = ({
         <button
           type="button"
           className={cn('todoapp__toggle-all', {
-            active: todos.length > 0 && todos.every(todo => todo.completed),
+            active: activeButton,
           })}
           data-cy="ToggleAllButton"
           onClick={onToggleAll}
